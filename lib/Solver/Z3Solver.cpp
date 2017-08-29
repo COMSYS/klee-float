@@ -170,7 +170,7 @@ bool Z3SolverImpl::internalRunSolver(
   // impact vs making one global solver and using push and pop?
   // TODO: is the "simple_solver" the right solver to use for
   // best performance?
-  Z3_solver theSolver = Z3_mk_simple_solver(builder->ctx);
+  Z3_solver theSolver = Z3_mk_solver(builder->ctx);
   Z3_solver_inc_ref(builder->ctx, theSolver);
   Z3_solver_set_params(builder->ctx, theSolver, solverParameters);
 
@@ -280,7 +280,8 @@ SolverImpl::SolverRunStatus Z3SolverImpl::handleSolverResponse(
   case Z3_L_UNDEF: {
     ::Z3_string reason =
         ::Z3_solver_get_reason_unknown(builder->ctx, theSolver);
-    if (strcmp(reason, "timeout") == 0 || strcmp(reason, "canceled") == 0) {
+    if (strcmp(reason, "timeout") == 0 || strcmp(reason, "canceled") == 0 ||
+        strcmp(reason, "(resource limits reached)") == 0) {
       return SolverImpl::SOLVER_RUN_STATUS_TIMEOUT;
     }
     if (strcmp(reason, "unknown") == 0) {
